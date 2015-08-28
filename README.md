@@ -1,7 +1,11 @@
-# Get Properties of your 3D mesh
+# Get 3D mesh properties
 
 This NPM-module will calculate the *volume*, *area*, and *boundingbox* of a 3d model.
 The algorithm is written in *C++*. And is using internaly the VCG library http://vcg.isti.cnr.it/vcglib/index.html
+
+## Supported file formats
+PLY, STL, OFF, OBJ, 3DS, COLLADA, PTX, V3D, PTS, APTS, XYZ, GTS, TRI, ASC, X3D, X3DV, VRML, ALN
+
 
 
 Usage
