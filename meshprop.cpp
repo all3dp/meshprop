@@ -9,7 +9,8 @@
 #include <vcg/complex/algorithms/stat.h>
 #include <vcg/complex/algorithms/update/bounding.h>
 
-#include <iostream>
+
+#include <node.h>
 
 class MyEdge;
 class MyFace;
@@ -23,38 +24,58 @@ class MyFace    : public vcg::Face< MyUsedTypes, vcg::face::FFAdj, vcg::face::No
 class MyEdge    : public vcg::Edge<MyUsedTypes>{};
 class MyMesh    : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<MyFace> , std::vector<MyEdge>  > {};
 
-int main( int argc, char **argv )
-{
-  if (argc != 2) {
-    std::cout << "missing argument";
-    return 1;
+
+#include <node.h>
+#include <v8.h>
+
+using namespace v8;
+
+void Method(const v8::FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = Isolate::GetCurrent();
+  HandleScope scope(isolate);
+
+  if (args.Length() < 2) {
+    isolate->ThrowException(Exception::TypeError(
+        String::NewFromUtf8(isolate, "Wrong number of arguments")));
+    return;
   }
 
   MyMesh mesh;
 
-  if (vcg::tri::io::Importer<MyMesh>::Open(mesh, argv[1]) != 0) {
-    std::cout << "can't import mesh";
-    return 1;
+  if (vcg::tri::io::Importer<MyMesh>::Open(mesh, *v8::String::Utf8Value(args[0]->ToString())) != 0) {
+    Local<Function> callback = Local<Function>::Cast(args[1]);
+    const unsigned argc = 1;
+    Local<Value> argv[argc] = { v8::Exception::Error(String::NewFromUtf8(isolate, "can't import mesh")) };
+    callback->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+
+    return;
   }
 
-  std::cout << "{" << std::endl;
-
   vcg::tri::Inertia<MyMesh> Ib(mesh);
-  std::cout << "  \"volume\" : " << Ib.Mass() << "," << std::endl;
 
-  std::cout << "  \"area\" : " << vcg::tri::Stat<MyMesh>::ComputeMeshArea(mesh) << "," << std::endl;
+  Local<Object> obj = Object::New(isolate);
+
+  obj->Set(String::NewFromUtf8(isolate, "volume"), Number::New(isolate, Ib.Mass()));
+  obj->Set(String::NewFromUtf8(isolate, "area"), Number::New(isolate, vcg::tri::Stat<MyMesh>::ComputeMeshArea(mesh) ));
 
   vcg::tri::UpdateBounding<MyMesh>::Box(mesh);
 
-  std::cout << "  \"bbox\" : {" << std::endl;
+  Local<Object> bbox = Object::New(isolate);
+  bbox->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, mesh.bbox.DimX()));
+  bbox->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, mesh.bbox.DimY()));
+  bbox->Set(String::NewFromUtf8(isolate, "z"), Number::New(isolate, mesh.bbox.DimZ()));
 
-  std::cout << "    \"x\" : " << mesh.bbox.DimX() << "," << std::endl;
-  std::cout << "    \"y\" : " << mesh.bbox.DimY() << "," << std::endl;
-  std::cout << "    \"z\" : " << mesh.bbox.DimZ() << std::endl;
+  obj->Set(String::NewFromUtf8(isolate, "bbox"), bbox);
 
-  std::cout << "  }" << std::endl;
+  Local<Function> callback = Local<Function>::Cast(args[1]);
+  const unsigned argc = 2;
+  Local<Value> argv[argc] = { v8::Null(isolate) , obj };
+  callback->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 
-  std::cout << "}" << std::endl;
-
-  return 0;
 }
+
+void Init(Handle<Object> exports, Handle<Object> module) {
+  NODE_SET_METHOD(module, "exports", Method);
+}
+
+NODE_MODULE(meshprop, Init)
