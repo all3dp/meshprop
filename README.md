@@ -8,13 +8,6 @@ The algorithm is written in *C++*. And is using internaly the VCG library http:/
 ## Supported file formats
 PLY, STL, OFF, OBJ, 3DS, COLLADA, PTX, V3D, PTS, APTS, XYZ, GTS, TRI, ASC, X3D, X3DV, VRML, ALN
 
-## Dependencies
-* qmake is required to build this module
-
-e.g.:
-```
-sudo apt-get install libqt4-dev qt4-qmake
-```
 
 Usage
 ```

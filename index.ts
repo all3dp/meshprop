@@ -7,7 +7,7 @@ export = meshprop;
 // started with `$ node <FILENAME>`
 if (require.main === module) {
 
-  meshprop('fixture/snowman.stl', (err, res) => {
+  meshprop('tests/fixture/snowman.stl', (err, res) => {
     console.log(err, res);
   });
 }

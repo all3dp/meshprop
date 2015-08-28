@@ -2,8 +2,8 @@
   "targets": [
     {
       "target_name": "meshprop",
-      "sources": [ "meshprop.cpp", "vcglib/wrap/ply/plylib.cpp" ],
-      "include_dirs": [".", "./vcglib"],
+      "sources": [ "lib/meshprop.cpp", "vcglib/wrap/ply/plylib.cpp" ],
+      "include_dirs": ["./lib", "./vcglib"],
       "cflags!": [ '-fno-exceptions' ],
             "cflags_cc!": [ '-fno-exceptions' ],
             "conditions": [

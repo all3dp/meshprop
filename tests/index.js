@@ -1,6 +1,6 @@
-/// <reference path="./typings/tsd.d.ts"/>
+/// <reference path="../typings/tsd.d.ts"/>
 var assert = require("assert");
-var meshprop = require('./index');
+var meshprop = require('../index');
 describe("meshprop tests", function () {
     it("get correct resuts for the fixture", function (done) {
         meshprop(__dirname + "/fixture/snowman.stl", function (err, res) {
@@ -25,4 +25,4 @@ describe("meshprop tests", function () {
         });
     });
 });
-//# sourceMappingURL=test.js.map
+//# sourceMappingURL=index.js.map

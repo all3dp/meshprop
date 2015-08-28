@@ -4,7 +4,7 @@
   "description": "Get 3D mesh properties",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test.js"
+    "test": "./node_modules/mocha/bin/mocha tests/*.js"
   },
   "author": "Jonathan Häberle <jonathan.haeberle@gmail.com> (https://github.com/dreampulse/)",
   "license": "MIT",

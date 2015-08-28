@@ -1,9 +1,9 @@
-/// <reference path="./typings/tsd.d.ts"/>
+/// <reference path="../typings/tsd.d.ts"/>
 
 import mocha = require("mocha");
 import assert = require("assert");
 
-import meshprop = require('./index');
+import meshprop = require('../index');
 
 describe("meshprop tests", () => {
 

@@ -5,10 +5,11 @@
         "sourceMap": true
     },
     "filesGlob": [
-        "*.ts"
+        "*.ts",
+        "tests/*.ts"
     ],
     "files": [
         "index.ts",
-        "test.ts"
+        "tests/index.ts"
     ]
 }
