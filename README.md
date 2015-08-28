@@ -1,5 +1,7 @@
 # Get 3D mesh properties
 
+[![Build Status](https://travis-ci.org/dreampulse/meshprop.svg?branch=master)](https://travis-ci.org/dreampulse/meshprop)
+
 This NPM-module will calculate the *volume*, *area*, and *boundingbox* of a 3d model.
 The algorithm is written in *C++*. And is using internaly the VCG library http://vcg.isti.cnr.it/vcglib/index.html
 
