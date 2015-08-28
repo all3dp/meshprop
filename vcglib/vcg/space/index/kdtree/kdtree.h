@@ -168,7 +168,7 @@ namespace vcg {
 		//first node inserted (no leaf). The others are made by the createTree function (recursively)
         mNodes.resize(1);
         mNodes.back().leaf = 0;
-        int numLevel = createTree(0, 0, mPoints.size(), 1, nofPointsPerCell, maxDepth);
+        createTree(0, 0, mPoints.size(), 1, nofPointsPerCell, maxDepth);
     }
 
     template<typename Scalar>
