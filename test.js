@@ -3,7 +3,8 @@ var assert = require("assert");
 var meshprop = require('./index');
 describe("meshprop tests", function () {
     it("get correct resuts for the fixture", function (done) {
-        meshprop("fixture/snowman.stl", function (err, res) {
+        console.log(__dirname + "/fixture/snowman.stl");
+        meshprop(__dirname + "/fixture/snowman.stl", function (err, res) {
             assert.equal(err, null);
             assert.deepEqual(res, {
                 "volume": 97177.8,

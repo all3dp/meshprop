@@ -3,9 +3,8 @@
 import child_process = require('child_process');
 
 function meshprop(filename, callback : (err : Error, res : string) => void) {
-  var cmd = 'meshprop ' + filename;
 
-  child_process.exec(cmd, (error, stdout, stderr) => {
+  child_process.exec(__dirname + '/meshprop ' + filename, (error, stdout, stderr) => {
     if (!error) {
       callback(null, JSON.parse(stdout.toString()));
     } else {
@@ -19,7 +18,7 @@ export = meshprop;
 
 // started with `$ node <FILENAME>`
 if (require.main === module) {
-  meshprop('fixture/snowman.stl_', (err, res) => {
+  meshprop('fixture/snowman.stl', (err, res) => {
     console.log(err, res);
   });
 }

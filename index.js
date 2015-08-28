@@ -1,8 +1,7 @@
 /// <reference path="./typings/tsd.d.ts"/>
 var child_process = require('child_process');
 function meshprop(filename, callback) {
-    var cmd = 'meshprop ' + filename;
-    child_process.exec(cmd, function (error, stdout, stderr) {
+    child_process.exec(__dirname + '/meshprop ' + filename, function (error, stdout, stderr) {
         if (!error) {
             callback(null, JSON.parse(stdout.toString()));
         }
@@ -13,7 +12,7 @@ function meshprop(filename, callback) {
 }
 ;
 if (require.main === module) {
-    meshprop('fixture/snowman.stl_', function (err, res) {
+    meshprop('fixture/snowman.stl', function (err, res) {
         console.log(err, res);
     });
 }

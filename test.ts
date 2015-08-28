@@ -8,7 +8,8 @@ import meshprop = require('./index');
 describe("meshprop tests", () => {
 
   it("get correct resuts for the fixture", (done) => {
-    meshprop("fixture/snowman.stl", (err, res) => {
+    console.log(__dirname + "/fixture/snowman.stl");
+    meshprop(__dirname + "/fixture/snowman.stl", (err, res) => {
       assert.equal(err, null);
       assert.deepEqual(res, {
         "volume" : 97177.8,
