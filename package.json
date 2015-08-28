@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test.js",
-    "preinstall": "make clean && make"
+    "preinstall": "qmake . && make clean && make"
   },
   "author": "Jonathan Häberle <jonathan.haeberle@gmail.com> (http://dreampulse.de/)",
   "license": "ISC",
