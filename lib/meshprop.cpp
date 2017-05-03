@@ -11,6 +11,7 @@
 
 
 #include <node.h>
+#include <v8.h>
 
 class MyEdge;
 class MyFace;
@@ -23,10 +24,6 @@ class MyVertex  : public vcg::Vertex<MyUsedTypes, vcg::vertex::Coord3f, vcg::ver
 class MyFace    : public vcg::Face< MyUsedTypes, vcg::face::FFAdj, vcg::face::Normal3f, vcg::face::VertexRef, vcg::face::BitFlags > {};
 class MyEdge    : public vcg::Edge<MyUsedTypes>{};
 class MyMesh    : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<MyFace> , std::vector<MyEdge>  > {};
-
-
-#include <node.h>
-#include <v8.h>
 
 using namespace v8;
 
@@ -74,8 +71,8 @@ void Method(const v8::FunctionCallbackInfo<Value>& args) {
 
 }
 
-void Init(Handle<Object> exports, Handle<Object> module) {
-  NODE_SET_METHOD(module, "exports", Method);
+void init(Handle<Object> exports) {
+  NODE_SET_METHOD(exports, "parse", Method);
 }
 
-NODE_MODULE(meshprop, Init)
+NODE_MODULE(meshprop, init);

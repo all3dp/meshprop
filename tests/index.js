@@ -3,7 +3,7 @@ var assert = require("assert");
 var meshprop = require('../index');
 describe("meshprop tests", function () {
     it("get correct resuts for the fixture", function (done) {
-        meshprop(__dirname + "/fixture/snowman.stl", function (err, res) {
+        meshprop.parse(__dirname + "/fixture/snowman.stl", function (err, res) {
             assert.equal(err, null);
             assert.deepEqual(res, {
                 "volume": 97177.8125,
@@ -18,7 +18,7 @@ describe("meshprop tests", function () {
         });
     });
     it("damaged file", function (done) {
-        meshprop("no-existing.stl", function (err, res) {
+        meshprop.parse("no-existing.stl", function (err, res) {
             assert.equal(res, null);
             assert.equal(err.message, "can't import mesh");
             done();
