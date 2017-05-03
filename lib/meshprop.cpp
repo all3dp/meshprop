@@ -71,7 +71,7 @@ void Method(const v8::FunctionCallbackInfo<Value>& args) {
 
 }
 
-void init(Handle<Object> exports) {
+void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "parse", Method);
 }
 
