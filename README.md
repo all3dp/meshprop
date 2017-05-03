@@ -13,7 +13,7 @@ Usage
 ```
 var meshprop = require('meshprop');
 
-meshprop('path-to-my-mesh.stl', function(err, props) {
+meshprop.parse('path-to-my-mesh.stl', function(err, props) {
   console.log(props);
 });
 ```
