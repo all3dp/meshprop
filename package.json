@@ -6,9 +6,9 @@
   "scripts": {
     "prepublish": "npm ls",
     "install": "node-pre-gyp install --fallback-to-build",
-    "build": "node-pre-gyp clean && node-pre-gyp build",
+    "build": "node-gyp configure && node-pre-gyp clean && node-pre-gyp build",
     "test": "mocha tests/*.js",
-    "release": "node-pre-gyp package && node-pre-gyp unpublish && node-pre-gyp publish"
+    "release": "node-pre-gyp package && node-pre-gyp testpackage && node-pre-gyp unpublish && node-pre-gyp publish"
   },
   "author": "Jonathan Häberle <jonathan.haeberle@gmail.com> (https://github.com/dreampulse/)",
   "license": "MIT",
