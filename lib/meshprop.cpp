@@ -1,14 +1,9 @@
 #include <vcg/complex/complex.h>
-
-// #include <wrap/io_trimesh/import_off.h>
 #include <wrap/io_trimesh/import.h>
-
 #include <vcg/complex/algorithms/inertia.h>
 #include <vcg/complex/algorithms/create/platonic.h>
-
 #include <vcg/complex/algorithms/stat.h>
 #include <vcg/complex/algorithms/update/bounding.h>
-
 
 #include <node.h>
 #include <v8.h>
@@ -32,8 +27,7 @@ void Method(const v8::FunctionCallbackInfo<Value>& args) {
   HandleScope scope(isolate);
 
   if (args.Length() < 2) {
-    isolate->ThrowException(Exception::TypeError(
-        String::NewFromUtf8(isolate, "Wrong number of arguments")));
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Wrong number of arguments")));
     return;
   }
 
@@ -44,7 +38,6 @@ void Method(const v8::FunctionCallbackInfo<Value>& args) {
     const unsigned argc = 1;
     Local<Value> argv[argc] = { v8::Exception::Error(String::NewFromUtf8(isolate, "can't import mesh")) };
     callback->Call(isolate->GetCurrentContext()->Global(), argc, argv);
-
     return;
   }
 
@@ -68,11 +61,10 @@ void Method(const v8::FunctionCallbackInfo<Value>& args) {
   const unsigned argc = 2;
   Local<Value> argv[argc] = { v8::Null(isolate) , obj };
   callback->Call(isolate->GetCurrentContext()->Global(), argc, argv);
-
 }
 
-void init(Local<Object> exports) {
+void Init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "parse", Method);
 }
 
-NODE_MODULE(meshprop, init);
+NODE_MODULE(meshprop, Init);
