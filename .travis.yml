@@ -15,5 +15,6 @@ env:
   - CXX=g++-4.8
 
 script:
-  - npm test
   - npm run build
+  - npm test
+  - npm run release
