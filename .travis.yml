@@ -1,6 +1,8 @@
 language: node_js
 node_js:
+  - "4"
   - "6"
+  - "7"
 
 addons:
   apt:
@@ -8,7 +10,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-      - xvfb
 
 env:
   - CXX=g++-4.8
