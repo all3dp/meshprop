@@ -22,12 +22,12 @@
     "stl"
   ],
   "dependencies": {
-    "node-pre-gyp": "^0.6.34"
+    "node-pre-gyp": "^0.10.0"
   },
   "devDependencies": {
-    "assert": "^1.3.0",
-    "aws-sdk": "^2.48.0",
-    "mocha": "^2.2.5"
+    "assert": "^1.4.1",
+    "aws-sdk": "^2.245.1",
+    "mocha": "^5.2.0"
   },
   "bundledDependencies": [
     "node-pre-gyp"
