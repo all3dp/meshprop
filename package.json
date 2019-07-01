@@ -10,7 +10,12 @@
     "test": "mocha tests/*.js",
     "release": "node-pre-gyp package && node-pre-gyp testpackage && node-pre-gyp unpublish && node-pre-gyp publish"
   },
-  "author": "Jonathan Häberle <jonathan.haeberle@gmail.com> (https://github.com/dreampulse/)",
+  "author": "All3dp <info@all3dp.com>",
+  "contributors": [
+    "Alexander Friedl <alexander@all3dp.com>",
+    "Henry <henry@all3dp.com>",
+    "Jonathan Häberle <jonathan.haeberle@gmail.com> (https://github.com/dreampulse/)"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
