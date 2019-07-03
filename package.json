@@ -4,7 +4,7 @@
   "description": "Get 3D mesh properties",
   "main": "index.js",
   "scripts": {
-    "prepublish": "npm ls",
+    "prepare": "npm ls",
     "install": "node-pre-gyp install --fallback-to-build",
     "build": "node-gyp configure && node-pre-gyp clean && node-pre-gyp build",
     "test": "mocha tests/*.js",
