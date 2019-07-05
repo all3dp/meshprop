@@ -1,3 +1,5 @@
 !core
 .git
 .travis.yml
+build
+node_modules
