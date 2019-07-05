@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts"/>
 var assert = require("assert");
 var meshprop = require('../index');
 describe("meshprop tests", function () {
@@ -25,4 +24,3 @@ describe("meshprop tests", function () {
         });
     });
 });
-//# sourceMappingURL=index.js.map
