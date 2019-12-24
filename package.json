@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "assert": "2.0.0",
-    "aws-sdk": "2.595.0",
+    "aws-sdk": "2.596.0",
     "mocha": "6.2.2"
   },
   "bundledDependencies": [
