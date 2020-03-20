@@ -6,8 +6,9 @@ The algorithm is written in *C++*. And is using internaly the VCG library http:/
 [![Build Status](https://travis-ci.org/all3dp/meshprop.svg?branch=master)](https://travis-ci.org/all3dp/meshprop)
 
 ## Supported file formats
-PLY, STL, OFF, OBJ, 3DS, COLLADA, PTX, V3D, PTS, APTS, XYZ, GTS, TRI, ASC, X3D, X3DV, VRML, ALN
+Supported by VCG library: PLY, STL, OFF, OBJ, 3DS, COLLADA, PTX, V3D, PTS, APTS, XYZ, GTS, TRI, ASC, X3D, X3DV, VRML, ALN
 
+Works most reliable with STL and PLY, other formats might experience problems with parsing geometries.
 
 Usage
 ```
