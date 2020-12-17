@@ -5,66 +5,63 @@
 #include <vcg/complex/algorithms/stat.h>
 #include <vcg/complex/algorithms/update/bounding.h>
 
-#include <node.h>
-#include <v8.h>
+#include <napi.h>
 
 class MyEdge;
 class MyFace;
 class MyVertex;
-struct MyUsedTypes : public vcg::UsedTypes<	vcg::Use<MyVertex>   ::AsVertexType,
-                                            vcg::Use<MyEdge>     ::AsEdgeType,
-                                            vcg::Use<MyFace>     ::AsFaceType>{};
+struct MyUsedTypes : public vcg::UsedTypes<vcg::Use<MyVertex>::AsVertexType,
+                                           vcg::Use<MyEdge>  ::AsEdgeType,
+                                           vcg::Use<MyFace>  ::AsFaceType>{};
 
 class MyVertex  : public vcg::Vertex<MyUsedTypes, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::BitFlags  >{};
 class MyFace    : public vcg::Face< MyUsedTypes, vcg::face::FFAdj, vcg::face::Normal3f, vcg::face::VertexRef, vcg::face::BitFlags > {};
 class MyEdge    : public vcg::Edge<MyUsedTypes>{};
 class MyMesh    : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<MyFace> , std::vector<MyEdge>  > {};
 
-using namespace v8;
+void Parse(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::HandleScope scope(env);
+  Napi::Function cb = info[1].As<Napi::Function>();
 
-void Method(const v8::FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
-
-  if (args.Length() < 2) {
-    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Wrong number of arguments")));
+  if (info.Length() < 2) {
+    Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
     return;
   }
 
   MyMesh mesh;
 
-  if (vcg::tri::io::Importer<MyMesh>::Open(mesh, *v8::String::Utf8Value(args[0]->ToString())) != 0) {
-    Local<Function> callback = Local<Function>::Cast(args[1]);
-    const unsigned argc = 1;
-    Local<Value> argv[argc] = { v8::Exception::Error(String::NewFromUtf8(isolate, "can't import mesh")) };
-    callback->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+  Napi::String path = info[0].As<Napi::String>();
+
+  if (vcg::tri::io::Importer<MyMesh>::Open(mesh, path.Utf8Value().c_str()) != 0) {
+    Napi::Error err = Napi::Error::New(env, "Can't import mesh");
+    cb.Call(env.Global(), { err.Value(), env.Null() });
     return;
   }
 
   vcg::tri::Inertia<MyMesh> Ib(mesh);
 
-  Local<Object> obj = Object::New(isolate);
+  Napi::Object obj = Napi::Object::New(env);
 
-  obj->Set(String::NewFromUtf8(isolate, "volume"), Number::New(isolate, Ib.Mass()));
-  obj->Set(String::NewFromUtf8(isolate, "area"), Number::New(isolate, vcg::tri::Stat<MyMesh>::ComputeMeshArea(mesh) ));
+  obj.Set("volume", Ib.Mass());
+  obj.Set("area", vcg::tri::Stat<MyMesh>::ComputeMeshArea(mesh));
 
   vcg::tri::UpdateBounding<MyMesh>::Box(mesh);
 
-  Local<Object> bbox = Object::New(isolate);
-  bbox->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, mesh.bbox.DimX()));
-  bbox->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, mesh.bbox.DimY()));
-  bbox->Set(String::NewFromUtf8(isolate, "z"), Number::New(isolate, mesh.bbox.DimZ()));
+  Napi::Object bbox = Napi::Object::New(env);
+  bbox.Set("x", mesh.bbox.DimX());
+  bbox.Set("y", mesh.bbox.DimY());
+  bbox.Set("z", mesh.bbox.DimZ());
 
-  obj->Set(String::NewFromUtf8(isolate, "bbox"), bbox);
+  obj.Set("bbox", bbox);
 
-  Local<Function> callback = Local<Function>::Cast(args[1]);
-  const unsigned argc = 2;
-  Local<Value> argv[argc] = { v8::Null(isolate) , obj };
-  callback->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+  cb.Call(env.Global(), { env.Null(), obj });
+  return;
 }
 
-void Init(Local<Object> exports) {
-  NODE_SET_METHOD(exports, "parse", Method);
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("parse", Napi::Function::New(env, Parse));
+  return exports;
 }
 
-NODE_MODULE(meshprop, Init);
+NODE_API_MODULE(meshprop, Init);
