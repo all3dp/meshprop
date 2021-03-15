@@ -5,9 +5,6 @@ on:
     branches-ignore:
       - master
 
-# env:
-#   CXX: g++-4.8
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -32,12 +29,6 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-npm-cache-
       
-      # - name: Install Ubuntu Toolchain
-      #   run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt update
-      
-      # - name: Install g++
-      #   run: sudo apt install g++-4.8
-
       - name: Install npm dependencies
         run: npm ci
 
