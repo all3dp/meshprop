@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "assert": "2.0.0",
+    "aws-sdk": "2.811.0",
     "mocha": "8.2.1"
   },
   "bundledDependencies": [
