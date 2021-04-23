@@ -27,13 +27,13 @@
     "stl"
   ],
   "dependencies": {
-    "node-addon-api": "3.0.2",
+    "node-addon-api": "3.1.0",
     "node-pre-gyp": "0.17.0"
   },
   "devDependencies": {
     "assert": "2.0.0",
-    "aws-sdk": "2.811.0",
-    "mocha": "8.2.1"
+    "aws-sdk": "2.891.0",
+    "mocha": "8.3.2"
   },
   "bundledDependencies": [
     "node-pre-gyp"
