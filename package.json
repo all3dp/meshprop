@@ -1,6 +1,6 @@
 {
   "name": "meshprop",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Get 3D mesh properties",
   "main": "index.js",
   "scripts": {
@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "assert": "2.0.0",
-    "aws-sdk": "2.891.0",
-    "mocha": "8.3.2"
+    "aws-sdk": "2.1062.0",
+    "mocha": "9.2.0"
   },
   "bundledDependencies": [
     "node-pre-gyp"
