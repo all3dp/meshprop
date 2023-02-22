@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "assert": "2.0.0",
-    "aws-sdk": "2.1062.0",
-    "mocha": "9.2.0"
+    "aws-sdk": "2.1320.0",
+    "mocha": "10.2.0"
   },
   "bundledDependencies": [
     "node-pre-gyp"
