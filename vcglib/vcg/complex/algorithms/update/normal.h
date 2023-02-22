@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -24,10 +24,12 @@
 #ifndef __VCG_TRI_UPDATE_NORMALS
 #define __VCG_TRI_UPDATE_NORMALS
 
-#include <vcg/complex/algorithms/update/flag.h>
+#include <vcg/space/triangle3.h>
+#include <vcg/complex/base.h>
+
 #include <vcg/complex/algorithms/polygon_support.h>
-#include <vcg/math/matrix44.h>
-#include <vcg/complex/exception.h>
+
+#include "flag.h"
 
 namespace vcg {
 namespace tri {
@@ -92,7 +94,7 @@ static void PerVertex(ComputeMeshType &m)
  for(FaceIterator f=m.face.begin();f!=m.face.end();++f)
    if( !(*f).IsD() && (*f).IsR() )
    {
-    typename FaceType::NormalType t = vcg::TriangleNormal(*f);
+    typename VertexType::NormalType t = vcg::TriangleNormal(*f);
 
     for(int j=0; j<(*f).VN(); ++j)
      if( !(*f).V(j)->IsD() && (*f).V(j)->IsRW() )
@@ -102,11 +104,12 @@ static void PerVertex(ComputeMeshType &m)
 
 static void PerFacePolygonal(ComputeMeshType &m)
 {
-for(FaceIterator fi=m.face.begin();fi!=m.face.end();++fi)
-{
-  if( !(*fi).IsD() )
-    fi->N() = PolygonNormal(*fi).Normalize();
-}
+  RequirePerFaceNormal(m);  
+  for(FaceIterator fi=m.face.begin();fi!=m.face.end();++fi)
+  {
+    if( !(*fi).IsD() )
+      fi->N() = PolygonNormal(*fi).Normalize();
+  }
 }
 
 ///  \brief Calculates the vertex normal as an angle weighted average. It does not need or exploit current face normals.
@@ -118,7 +121,7 @@ G. Thurmer, C. A. Wuthrich
 "Computing vertex normals from polygonal facets"
 Journal of Graphics Tools, 1998
  */
- static void PerVertexAngleWeighted(ComputeMeshType &m)
+static void PerVertexAngleWeighted(ComputeMeshType &m)
 {
   PerVertexClear(m);
   FaceIterator f;
@@ -170,7 +173,7 @@ static void PerFace(ComputeMeshType &m)
   RequirePerFaceNormal(m);
   for(FaceIterator f=m.face.begin();f!=m.face.end();++f)
     if( !(*f).IsD() )
-              f->N() = TriangleNormal(*f).Normalize();
+              f->N() = TriangleNormal(*f);
 }
 
 
@@ -206,7 +209,7 @@ static void PerVertexFromCurrentFaceNormal(ComputeMeshType &m)
  for(fi=m.face.begin();fi!=m.face.end();++fi)
    if( !(*fi).IsD())
    {
-    for(int j=0; j<3; ++j)
+    for(int j=0; j<(*fi).VN(); ++j)
             if( !(*fi).V(j)->IsD())
                     (*fi).V(j)->N() += (*fi).cN();
    }
@@ -344,29 +347,30 @@ static void PerBitPolygonFaceNormalized(ComputeMeshType &m)
 /// \brief Multiply the vertex normals by the matrix passed. By default, the scale component is removed.
 static void PerVertexMatrix(ComputeMeshType &m, const Matrix44<ScalarType> &mat, bool remove_scaling= true)
 {
-  tri::RequirePerVertexNormal(m);
-    float scale;
+    tri::RequirePerVertexNormal(m);
+    ScalarType scale;
 
     Matrix33<ScalarType> mat33(mat,3);
 
 
     if(remove_scaling){
         scale = pow(mat33.Determinant(),(ScalarType)(1.0/3.0));
-        mat33[0][0]/=scale;
-        mat33[1][1]/=scale;
-        mat33[2][2]/=scale;
+        Point3<ScalarType> scaleV(scale,scale,scale);
+        Matrix33<ScalarType> S;
+        S.SetDiagonal(scaleV.V());
+        mat33*=S;
     }
 
-  for(VertexIterator vi=m.vert.begin();vi!=m.vert.end();++vi)
-   if( !(*vi).IsD() && (*vi).IsRW() )
-     (*vi).N()  = mat33*(*vi).N();
+    for(VertexIterator vi=m.vert.begin();vi!=m.vert.end();++vi)
+        if( !(*vi).IsD() && (*vi).IsRW() )
+            (*vi).N()  = mat33*(*vi).N();
 }
 
 /// \brief Multiply the face normals by the matrix passed. By default, the scale component is removed.
 static void PerFaceMatrix(ComputeMeshType &m, const Matrix44<ScalarType> &mat, bool remove_scaling= true)
 {
-  tri::RequirePerFaceNormal(m);
-  float scale;
+    tri::RequirePerFaceNormal(m);
+    ScalarType scale;
 
     Matrix33<ScalarType> mat33(mat,3);
 
@@ -379,9 +383,9 @@ static void PerFaceMatrix(ComputeMeshType &m, const Matrix44<ScalarType> &mat, b
         mat33[2][2]/=scale;
     }
 
-  for(FaceIterator fi=m.face.begin();fi!=m.face.end();++fi)
-   if( !(*fi).IsD() && (*fi).IsRW() )
-     (*fi).N() = mat33* (*fi).N();
+    for(FaceIterator fi=m.face.begin();fi!=m.face.end();++fi)
+        if( !(*fi).IsD() && (*fi).IsRW() )
+            (*fi).N() = mat33* (*fi).N();
 }
 
 /// \brief Compute per wedge normals taking into account the angle between adjacent faces.

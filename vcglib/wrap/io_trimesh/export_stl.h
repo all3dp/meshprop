@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -75,14 +75,14 @@ public:
 typedef typename SaveMeshType::FaceType FaceType;
 typedef unsigned short CallBackSTLFaceAttribute(const SaveMeshType &m, const FaceType &f);
 
-static int Save(SaveMeshType &m, const char * filename, const int &mask, CallBackPos *)
+static int Save(const SaveMeshType &m, const char * filename, const int &mask, CallBackPos *)
 {
  return Save(m,filename,true,mask);
 }
 
-static int Save(SaveMeshType &m, const char * filename , bool binary =true, int mask=0, const char *objectname=0, bool magicsMode=0)
+static int Save(const SaveMeshType &m, const char * filename , bool binary =true, int mask=0, const char *objectname=0, bool magicsMode=0)
 {
-  typedef typename SaveMeshType::FaceIterator FaceIterator;
+  typedef typename SaveMeshType::ConstFaceIterator FaceIterator;
     FILE *fp;
 
     fp = fopen(filename,"wb");
@@ -150,21 +150,24 @@ static int Save(SaveMeshType &m, const char * filename , bool binary =true, int 
         }
         fprintf(fp,"endsolid vcg\n");
     }
+	int result = 0;
+	if (ferror(fp)) result = 2;
     fclose(fp);
-    return 0;
+	return result;
 }
 static const char *ErrorMsg(int error)
 {
-  static std::vector<std::string> stl_error_msg;
-  if(stl_error_msg.empty())
-  {
-    stl_error_msg.resize(2 );
-    stl_error_msg[0]="No errors";
-      stl_error_msg[1]="Can't open file";
-    }
+	static std::vector<std::string> stl_error_msg;
+	if (stl_error_msg.empty())
+	{
+		stl_error_msg.resize(3);
+		stl_error_msg[0] = "No errors";
+		stl_error_msg[1] = "Can't open file";
+		stl_error_msg[2] = "Output Stream error";
+	}
 
-  if(error>1 || error<0) return "Unknown error";
-  else return stl_error_msg[error].c_str();
+	if (error>2 || error<0) return "Unknown error";
+	else return stl_error_msg[error].c_str();
 };
 
 /*

@@ -39,6 +39,8 @@
  *
  */
 
+#ifndef __VCG_IGL_LEAST_SQUARES_CONFORMAL_MAPS
+#define __VCG_IGL_LEAST_SQUARES_CONFORMAL_MAPS
 
 #include <igl/lscm.h>
 #include <vcg/complex/algorithms/mesh_to_matrix.h>
@@ -67,7 +69,7 @@ void OptimizeUV_LSCM( MeshType& m ,
     vcg::tri::MeshToMatrix< MeshType >::GetTriMeshData( m, F, V );
 
     // build fixed points data
-    int nFixed = 0;
+    size_t nFixed = 0;
     for (int i=0; i<(int)m.vert.size(); i++) {
         if (m.vert[i].Flags()&fixedMask) nFixed++;
     }
@@ -97,3 +99,4 @@ void OptimizeUV_LSCM( MeshType& m ,
 }
 
 }} // namespaces
+#endif

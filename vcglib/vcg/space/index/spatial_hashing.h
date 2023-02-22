@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -26,36 +26,15 @@
 
 #include <vcg/space/index/grid_util.h>
 #include <vcg/space/index/grid_closest.h>
+#include<unordered_map>
 //#include <map>
 #include <vector>
 #include <algorithm>
-#ifdef _WIN32
- #ifndef __MINGW32__
-  #include <hash_map>
-  #define STDEXT stdext
- #else
-  #include <ext/hash_map>
-  #define STDEXT __gnu_cxx
- #endif
-#else  // We are in the *nix gcc branch
-#if (__GNUC__ ==4) && (__GNUC_MINOR__ > 3) && (defined(__DEPRECATED))
-  #undef __DEPRECATED // since gcc 4.4 <ext/hash_map> was deprecated and generate warnings. Relax Deprecation Just for this...
-  #define ___WE_UNDEFINED_DEPRECATED__
-#endif
- #include <ext/hash_map>
- #define STDEXT __gnu_cxx
-#if defined(___WE_UNDEFINED_DEPRECATED__)
-#define __DEPRECATED
-#endif
-#endif
-
 
 namespace vcg{
 
-
-
     // hashing function
-    struct HashFunctor : public std::unary_function<Point3i, size_t>
+    struct HashFunctor
     {
         enum
           { // parameters for hash table
@@ -83,7 +62,7 @@ namespace vcg{
 
     /** Spatial Hash Table
     Spatial Hashing as described in
-    "Optimized Spatial Hashing for Coll	ision Detection of Deformable Objects",
+    "Optimized Spatial Hashing for Collision Detection of Deformable Objects",
     Matthias Teschner and Bruno Heidelberger and Matthias Muller and Danat Pomeranets and Markus Gross
     */
     template < typename ObjType,class FLT=double>
@@ -101,7 +80,7 @@ namespace vcg{
     // the hash index directly the grid structure.
     // We use a MultiMap because we need to store many object (faces) inside each cell of the grid.
 
-    typedef typename STDEXT::hash_multimap<Point3i, ObjType *, HashFunctor> HashType;
+    typedef typename std::unordered_multimap<Point3i, ObjType *, HashFunctor> HashType;
     typedef typename HashType::iterator HashIterator;
     HashType hash_table; // The real HASH TABLE **************************************
 
@@ -225,10 +204,10 @@ protected:
                     inSphVec.push_back(hi);
                 }
               }
-          return inSphVec.size();
+          return int(inSphVec.size());
         }
 
-        int RemoveInSphere(const Point3<ScalarType> &p, const ScalarType radius)
+        size_t RemoveInSphere(const Point3<ScalarType> &p, const ScalarType radius)
         {
           std::vector<HashIterator> inSphVec;
           CountInSphere(p,radius,inSphVec);

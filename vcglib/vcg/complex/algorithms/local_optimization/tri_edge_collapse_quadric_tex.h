@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -155,7 +155,8 @@ class QuadricTexHelper
            return qv[i].second;
        }
 
-       assert(0);
+       assert(0);       
+       return qv[0].second; 
     }
       static math::Quadric<double> &Qd3(VertexType *v) {return TD3()[*v];}
     static math::Quadric<double> &Qd3(VertexType &v) {return TD3()[v];}

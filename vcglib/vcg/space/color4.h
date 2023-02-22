@@ -2,13 +2,13 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
 * All rights reserved.                                                      *
 *                                                                           *
-* This program is free software; you can redistribute it and/or modify      *
+* This program is free software; you can redistribute it and/or modify      *   
 * it under the terms of the GNU General Public License as published by      *
 * the Free Software Foundation; either version 2 of the License, or         *
 * (at your option) any later version.                                       *
@@ -16,7 +16,7 @@
 * This program is distributed in the hope that it will be useful,           *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
-* GNU General Public License (http://www.gnu.o/licenses/gpl.txt)          *
+* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 *                                                                           *
 ****************************************************************************/
@@ -71,6 +71,7 @@ public:
   inline Color4 ( const Point4<T> &c) :Point4<T>(c) {}
   inline Color4 (){}
   inline Color4 (ColorConstant cc);
+  inline Color4 (unsigned int cc);
 
   template <class Q>
     inline void Import(const Color4<Q> & b )
@@ -147,6 +148,27 @@ public:
         *this= Color4<T>(Color4<T>::Blue);
     }
 
+    inline void SetColorRampParula(const float &minf,const float  &maxf ,float v)
+    {
+      if(minf>maxf) { SetColorRampParula(maxf,minf,maxf+(minf-v)); return; }
+      SetColorRampParula((v-minf)/(maxf-minf));      
+    }
+
+    inline void SetColorRampParula(float v)
+    {
+      if(v<0) v=0;
+      else if(v>1) v=1;
+      
+      unsigned int ParuVal[9]={0xff801627,  0xffe16303,  0xffd48514,
+                               0xffc6a706,  0xff9eb938,  0xff73bf92,
+                               0xff56bad9,  0xff2ecefc,  0xff0afaff};
+      int ind = int(floor(v*8.0f)); 
+      float div = (v*8.0f - ind);
+      if(div<0) div=0;
+      else if(div>1) div=1;
+      lerp(Color4<T>(ParuVal[ind]),  Color4<T>(ParuVal[ind+1]), div);
+    }
+
     void SetHSVColor( float h, float s, float v)
     {
       float r,g,b;
@@ -158,10 +180,12 @@ public:
         (*this)[3]=255;
         return;
       }
+      float dummy;
+      h = modff(h,&dummy);
       if(h==1.0) h = 0.0;
 
-      int i   = int( floor(h*6.0) );
-      float f = float(h*6.0f - floor(h*6.0f));
+      int i   = int( floor(h*6.0f) );
+      float f = float(h*6.0f- floor(h*6.0f));
 
       float p = v*(1.0f-s);
       float q = v*(1.0f-s*f);
@@ -185,12 +209,18 @@ public:
 
 inline static Color4 GrayShade(float f)
 {
- return Color4(f,f,f,1);
+  if(f<0) f=0.0f;
+  else if(f>1) f=1.0f;
+  
+  return Color4(f,f,f,1);
 }
 
 inline void SetGrayShade(float f)
 {
- Import(Color4<float>(f,f,f,1));
+  if(f<0) f=0.0f;
+  else if(f>1) f=1.0f;
+  
+  Import(Color4<float>(f,f,f,1));
 }
 
 
@@ -212,7 +242,8 @@ inline static Color4 Scatter(int range, int value,float Sat=.3f,float Val=.9f)
                 value -= (m+1)>>1;
                 m >>= 1;
             }
-    else m = (m+1)>>1;
+			else m = (m+1)>>1;
+
     if (r>range-b) r = range-b;
 
     //TRACE("Scatter range 0..%i, in %i out %i\n",n,a,b);
@@ -228,8 +259,9 @@ inline static Color4 ColorRamp(const float &minf,const float  &maxf ,float v )
   return rc;
 }
 
-inline static unsigned short ToUnsignedB5G5R5(Color4 &) { return 0;}
-inline static unsigned short ToUnsignedR5G5B5(Color4 &) { return 0;}
+inline static unsigned short ToUnsignedB5G5R5(const Color4 &) { return 0;}
+inline static unsigned short ToUnsignedR5G5B5(const Color4 &) { return 0;}
+inline static unsigned int ToUnsignedA8R8G8B8(const Color4 &) { return 0;}
 
 inline static Color4 FromUnsignedB5G5R5(unsigned short)
 {
@@ -252,6 +284,15 @@ inline void Color4<float>::Import(const Color4<unsigned char> &b)
 }
 
 template <> template <>
+inline void Color4<double>::Import(const Color4<unsigned char> &b)
+{
+  (*this)[0]=b[0]/255.0;
+  (*this)[1]=b[1]/255.0;
+  (*this)[2]=b[2]/255.0;
+  (*this)[3]=b[3]/255.0;
+}
+
+template <> template <>
 inline void Color4<unsigned char>::Import(const Color4<float> &b)
 {
   (*this)[0]=(unsigned char)(b[0]*255.0f);
@@ -267,6 +308,15 @@ inline void Color4<unsigned char>::Import(const Point4<float> &b)
   (*this)[1]=(unsigned char)(b[1]*255.0f);
   (*this)[2]=(unsigned char)(b[2]*255.0f);
   (*this)[3]=(unsigned char)(b[3]*255.0f);
+}
+
+template <> template <>
+inline void Color4<unsigned char>::Import(const Point4<double> &b)
+{
+  (*this)[0]=(unsigned char)(b[0]*255.0);
+  (*this)[1]=(unsigned char)(b[1]*255.0);
+  (*this)[2]=(unsigned char)(b[2]*255.0);
+  (*this)[3]=(unsigned char)(b[3]*255.0);
 }
 
 template <> template <>
@@ -289,6 +339,16 @@ inline Color4<float> Color4<float>::Construct( const Color4<unsigned char> & b )
                                     (float)(b[3])/255.0f);
 }
 
+template <> template <>
+inline Color4<double> Color4<double>::Construct( const Color4<unsigned char> & b )
+{
+    return Color4<double>(
+                                    (double)(b[0])/255.0,
+                                    (double)(b[1])/255.0,
+                                    (double)(b[2])/255.0,
+                                    (double)(b[3])/255.0);
+}
+
 template<>
 inline Color4<unsigned char>::Color4(Color4<unsigned char>::ColorConstant cc)
 {
@@ -301,12 +361,45 @@ inline Color4<float>::Color4(Color4<float>::ColorConstant cc)
   Import(Color4<unsigned char>((Color4<unsigned char>::ColorConstant)cc));
 }
 
+template<>
+inline Color4<double>::Color4(Color4<double>::ColorConstant cc)
+{
+  Import(Color4<unsigned char>((Color4<unsigned char>::ColorConstant)cc));
+}
+
+template<>
+inline Color4<unsigned char>::Color4(unsigned int cc)
+{
+  *((int *)this )= cc;
+}
+
+template<>
+inline Color4<float>::Color4(unsigned int cc)
+{
+  Import(Color4<unsigned char>(cc));
+}
+
+template<>
+inline Color4<double>::Color4(unsigned int cc)
+{
+  Import(Color4<unsigned char>(cc));
+}
+
 inline Color4<float> Clamp(Color4<float> &c)
 {
     c[0]=math::Clamp(c[0],0.0f,1.0f);
     c[1]=math::Clamp(c[1],0.0f,1.0f);
     c[2]=math::Clamp(c[2],0.0f,1.0f);
     c[3]=math::Clamp(c[3],0.0f,1.0f);
+    return c;
+}
+
+inline Color4<double> Clamp(Color4<double> &c)
+{
+    c[0]=math::Clamp(c[0],0.0,1.0);
+    c[1]=math::Clamp(c[1],0.0,1.0);
+    c[2]=math::Clamp(c[2],0.0,1.0);
+    c[3]=math::Clamp(c[3],0.0,1.0);
     return c;
 }
 
@@ -328,7 +421,7 @@ typedef Color4<double>         Color4d;
 
 
 template<>
-inline unsigned short Color4<unsigned char>::ToUnsignedB5G5R5(Color4<unsigned char> &cc)
+inline unsigned short Color4<unsigned char>::ToUnsignedB5G5R5(const Color4<unsigned char> &cc)
 {
   unsigned short r = cc[0]/8;
   unsigned short g = cc[1]/8;
@@ -338,12 +431,23 @@ inline unsigned short Color4<unsigned char>::ToUnsignedB5G5R5(Color4<unsigned ch
 }
 
 template<>
-inline unsigned short Color4<unsigned char>::ToUnsignedR5G5B5(Color4<unsigned char> &cc)
+inline unsigned short Color4<unsigned char>::ToUnsignedR5G5B5(const Color4<unsigned char> &cc)
 {
   unsigned short r = cc[0]/8;
   unsigned short g = cc[1]/8;
   unsigned short b = cc[2]/8;
   unsigned short res = r + g*32 + b*1024;
+  return res;
+}
+
+template<>
+inline unsigned int Color4<unsigned char>::ToUnsignedA8R8G8B8(const Color4<unsigned char> &cc)
+{
+  unsigned int r = cc[0];
+  unsigned int g = cc[1];
+  unsigned int b = cc[2];
+  unsigned int a = cc[3];
+  unsigned int res = (r << 16) | (g << 8) | (b) | (a << 24);
   return res;
 }
 

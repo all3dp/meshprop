@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -109,7 +109,7 @@ public:
 	{ if (NORM) return ScalarType((p-_ori)*_dir); 
 		else      return ScalarType((p-_ori)*_dir/_dir.SquaredNorm()); 
 	}
-	  /// returns wheter this type is normalized or not
+	  /// returns whether this type is normalized or not
 	static bool IsNormalized() {return NORM;};
 	  /// calculates the point of parameter t on the ray.
 	inline PointType P( const ScalarType t ) const

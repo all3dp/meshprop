@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -23,16 +23,8 @@
 #ifndef POLYGON_POLYCHORD_COLLAPSE_H
 #define POLYGON_POLYCHORD_COLLAPSE_H
 
-#include <vector>
 #include <list>
-#if __cplusplus >= 201103L
-  #include <unordered_map>
-#else
-  #include <map>
-#endif
-#include <set>
-#include <algorithm>
-#include <iterator>
+#include <unordered_map>
 #include <vcg/complex/complex.h>
 #include <vcg/simplex/face/jumping_pos.h>
 

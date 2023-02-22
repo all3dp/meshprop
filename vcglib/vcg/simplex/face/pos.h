@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -29,7 +29,7 @@
 #ifndef __VCG_FACE_POS
 #define __VCG_FACE_POS
 
-#include <assert.h>
+#include <cassert>
 
 namespace vcg {
 namespace face {
@@ -68,19 +68,19 @@ public:
     /// Index of the edge
     int z;
     /// Pointer to the vertex
-    VertexType *v;
+    VertexType * v;
 
     /// Default constructor
     Pos() : f(0), z(-1), v(0) {}
     /// Constructor which associates the half-edge element with a face, its edge and its vertex
     /// \note that the input must be consistent, e.g. it should hold that \c vp==fp->V0(zp) or \c vp==fp->V1(zp)
-    Pos(FaceType * const fp, int const zp, VertexType * const vp)
+    Pos(FaceType * fp, int zp, VertexType * vp)
     {
         f=fp; z=zp; v=vp;
         assert((vp==fp->V0(zp))||(vp==fp->V1(zp)));
     }
-    Pos(FaceType * const fp, int const zp){f=fp; z=zp; v=f->V(zp);}
-    Pos(FaceType * const fp, VertexType * const vp)
+    Pos(FaceType * fp, int zp){f=fp; z=zp; v=f->V(zp);}
+    Pos(FaceType * fp, VertexType * vp)
     {
         f = fp;
         v = vp;
@@ -124,13 +124,19 @@ public:
                                   (v<=p.v);
     }
 
-    /// Assignment operator
-    inline PosType & operator = ( const PosType & h ){
-        f=h.f;
-        z=h.z;
-        v=h.v;
-        return *this;
+    /// Operator to order half-edge; it's compare at the first the face pointers, then the index of the edge and finally the vertex pointers
+    inline bool operator < ( PosType const & p) const {
+        if ((*this)==p)return false;
+        return ((*this)<=p);
     }
+
+    /// Assignment operator
+    //inline PosType & operator = ( const PosType & h ){
+    //    f=h.f;
+    //    z=h.z;
+    //    v=h.v;
+    //    return *this;
+    //}
 
     /// Set to null the half-edge
     void SetNull(){
@@ -194,10 +200,9 @@ public:
         assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V((z))==v));
         FaceType *nf=f->FFp(z);
         int nz=f->FFi(z);
-        assert(nf->V(nf->Prev(nz))!=v && (nf->V(nf->Next(nz))==v || nf->V((nz))==v));
+        assert(nf->V(nf->Prev(nz))!=v && (nf->V(nf->Next(nz))==v || nf->V(nz)==v));
         f=nf;
         z=nz;
-        assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
     }
 
     /// Changes vertex maintaining the same face and the same edge
@@ -214,15 +219,22 @@ public:
     }
 
     /// return the vertex that it should have if we make FlipV;
-    VertexType *VFlip() const
+	VertexType *VFlip()
     {
-        assert(f->cV(f->Prev(z))!=v && (f->cV(f->Next(z))==v || f->cV(z)==v));
-        if(f->cV(f->Next(z))==v)	return f->cV(z);
-        else			return f->cV(f->Next(z));
+		assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
+		if(f->V(f->Next(z))==v)	return f->V(z);
+		else			return f->V(f->Next(z));
     }
 
+	const VertexType *VFlip() const
+	{
+		assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
+		if(f->V(f->Next(z))==v)	return f->V(z);
+		else			return f->V(f->Next(z));
+	}
+
     /// return the face that it should have if we make FlipF;
-    FaceType *FFlip() const
+	FaceType *FFlip()
     {
         //        assert( f->FFp(z)->FFp(f->FFi(z))==f );
         //        assert(f->V(f->Prev(z))!=v);
@@ -230,6 +242,15 @@ public:
         FaceType *nf=f->FFp(z);
         return nf;
     }
+
+	const FaceType *FFlip() const
+	{
+		//        assert( f->FFp(z)->FFp(f->FFi(z))==f );
+		//        assert(f->V(f->Prev(z))!=v);
+		//        assert(f->V(f->Next(z))==v || f->V((z+0)%f->VN())==v);
+		const FaceType *nf=f->FFp(z);
+		return nf;
+	}
 
 
     // Trova il prossimo half-edge di bordo (nhe)
@@ -285,38 +306,10 @@ public:
         //assert(f->FFp(z)==f); // f is border along j
     }
 
-    /// Finds the next Crease half-edge border
-    /// TODO change crease flag with something more generic (per edge)
-    void NextCrease( )
-    {
-        assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
-        assert(IsCrease()); // f is border along j
-        // Si deve cambiare faccia intorno allo stesso vertice v
-        //finche' non si trova una faccia di bordo.
-        do
-        {
-            FlipE();
-            if (!IsCrease()) FlipF();
-        }
-        while(!IsCrease());
-
-        // L'edge j e' di bordo e deve contenere v
-        assert(IsCrease() &&( f->V(z)==v || f->V(f->Next(z))==v ));
-
-        FlipV();
-        assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
-    }
-
     /// Checks if the half-edge is of border
     bool IsBorder()const
     {
         return face::IsBorder(*f,z);
-    }
-
-    /// Checks if the half-edge is of crease
-    bool IsCrease() const
-    {
-        return f->IsCrease(z);
     }
 
     bool IsFaux() const
@@ -328,7 +321,36 @@ public:
     {
         return face::IsManifold(*f,z);
     }
+    
+    void NextEdgeS( )
+    {
+        assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
+        assert(IsEdgeS());
+        do
+        {
+            FlipE();
+            if (!IsEdgeS()) FlipF();
+        }
+        while(!IsEdgeS());
 
+        assert(IsEdgeS() &&( f->V(z)==v || f->V(f->Next(z))==v ));
+
+        FlipV();
+        assert(f->V(f->Prev(z))!=v && (f->V(f->Next(z))==v || f->V(z)==v));
+    }
+
+    bool IsFaceS() const { return f->IsS();}
+    bool IsEdgeS() const { return f->IsFaceEdgeS(z);}
+    bool IsVertS() const { return v->IsS();}
+    
+    /*!
+     * Returns the angle (in radiant) between the two edges incident on V.
+     */
+    ScalarType AngleRad() const
+    {
+        return Angle(f->V(f->Prev(z))->cP()-v->cP(), f->V(f->Next(z))->cP()-v->cP());
+    }
+    
     /*!
      * Returns the number of vertices incident on the vertex pos is currently pointing to.
      */
@@ -493,7 +515,10 @@ public:
         f = t->VFp(z);
         z = t->VFi(z);
     }
-
+	void operator++(int)
+	{
+		++(*this);
+	}
 };
 
 /*@}*/

@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -138,12 +138,6 @@ public:
 
 
 
-
-
-
-
-
-
 /*! \brief class for computing approximate geodesic distances on a mesh
 
   require VF Adjacency relation
@@ -176,13 +170,14 @@ public:
 
 
   struct DIJKDist{
-    DIJKDist(VertexPointer _v):v(_v){}
+	DIJKDist(VertexPointer _v):v(_v), q(_v->Q()){}
     VertexPointer v;
+	ScalarType q;
 
     bool operator < (const DIJKDist &o) const
     {
-      if( v->Q() != o.v->Q())
-        return v->Q() > o.v->Q();
+		if( q != o.q)
+		return q > o.q;
       return v<o.v;
     }
    };
@@ -212,11 +207,12 @@ public:
   typedef SimpleTempData<std::vector<VertexType>, TempData >  TempDataType;
 
 
-  struct pred: public std::binary_function<VertDist,VertDist,bool>{
-    pred(){}
-    bool operator()(const VertDist& v0, const VertDist& v1) const
-    {return (v0.d > v1.d);}
-  };
+	struct pred {
+		pred() {};
+		bool operator()(const VertDist& v0, const VertDist& v1) const {
+			return (v0.d > v1.d);
+		}
+	};
 
   /*
    *
@@ -514,7 +510,7 @@ It is just a simple wrapper of the basic Compute()
   static inline std::string parentsAttributeName(void) { return "parent"; }
 
   template <class DistanceFunctor>
-  static void PerFaceDijsktraCompute(MeshType &m, const std::vector<FacePointer> &seedVec,
+  static void PerFaceDijkstraCompute(MeshType &m, const std::vector<FacePointer> &seedVec,
                                      DistanceFunctor &distFunc,
                                      ScalarType maxDistanceThr  = std::numeric_limits<ScalarType>::max(),
                                      std::vector<FacePointer> *InInterval=NULL,
@@ -579,21 +575,18 @@ It is just a simple wrapper of the basic Compute()
 
 
   template <class DistanceFunctor>
-  static void PerVertexDijsktraCompute(MeshType &m, const std::vector<VertexPointer> &seedVec,
+  static void PerVertexDijkstraCompute(MeshType &m, const std::vector<VertexPointer> &seedVec,
                                        DistanceFunctor &distFunc,
-                                     ScalarType maxDistanceThr  = std::numeric_limits<ScalarType>::max(),
-                                     std::vector<VertexPointer> *InInterval=NULL,bool avoid_selected=false,
-                                     VertexPointer target=NULL)
+                                       ScalarType maxDistanceThr  = std::numeric_limits<ScalarType>::max(),
+                                       std::vector<VertexPointer> *InInterval=NULL,
+                                       typename MeshType::template PerVertexAttributeHandle<VertexPointer> * sourceHandle= NULL,
+                                       typename MeshType::template PerVertexAttributeHandle<VertexPointer> * parentHandle=NULL,
+                                       bool avoid_selected=false,
+                                       VertexPointer target=NULL)
   {
     tri::RequireVFAdjacency(m);
     tri::RequirePerVertexMark(m);
     tri::RequirePerVertexQuality(m);
-
-    typename MeshType::template PerVertexAttributeHandle<VertexPointer> sourceHandle
-        = tri::Allocator<MeshType>::template GetPerVertexAttribute<VertexPointer>(m, sourcesAttributeName());
-
-    typename MeshType::template PerVertexAttributeHandle<VertexPointer> parentHandle
-        = tri::Allocator<MeshType>::template GetPerVertexAttribute<VertexPointer> (m, parentsAttributeName());
 
     std::vector<DIJKDist> Heap;
     tri::UnMarkAll(m);
@@ -603,8 +596,10 @@ It is just a simple wrapper of the basic Compute()
       assert(!tri::IsMarked(m,seedVec[i]));
       tri::Mark(m,seedVec[i]);
       seedVec[i]->Q()=0;
-      sourceHandle[seedVec[i]]=seedVec[i];
-      parentHandle[seedVec[i]]=seedVec[i];
+      if (sourceHandle!=NULL)
+      (*sourceHandle)[seedVec[i]]=seedVec[i];
+      if (parentHandle!=NULL)
+      (*parentHandle)[seedVec[i]]=seedVec[i];
       Heap.push_back(DIJKDist(seedVec[i]));
       if (InInterval!=NULL) InInterval->push_back(seedVec[i]);
     }
@@ -631,8 +626,10 @@ It is just a simple wrapper of the basic Compute()
           Heap.push_back(DIJKDist(nextV));
           push_heap(Heap.begin(),Heap.end());
           if (InInterval!=NULL) InInterval->push_back(nextV);
-          sourceHandle[nextV] = sourceHandle[curr];
-          parentHandle[nextV] = curr;
+          if (sourceHandle!=NULL)
+          (*sourceHandle)[nextV] = (*sourceHandle)[curr];
+          if (parentHandle!=NULL)
+          (*parentHandle)[nextV] = curr;
 //          printf("Heapsize %i nextDist = %f curr vert %i next vert %i \n",Heap.size(), nextDist, tri::Index(m,curr), tri::Index(m,nextV));
         }
       }
