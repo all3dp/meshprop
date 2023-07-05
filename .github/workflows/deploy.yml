@@ -6,11 +6,11 @@ on:
       - master
 
 jobs:
-  release:
+  release-ubuntu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '16', '18', '20' ]
+        node: ["16", "18", "20"]
 
     steps:
       - name: Checkout
@@ -28,7 +28,7 @@ jobs:
           key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.OS }}-npm-cache-
-      
+
       - name: Install npm dependencies
         run: npm ci
 
@@ -37,7 +37,45 @@ jobs:
 
       - name: Tests
         run: npm test
-              
+
+      - name: Release
+        run: npm run release
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  release-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        node: ["16", "18", "20"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache NPM dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests
+        run: npm test
+
       - name: Release
         run: npm run release
         env:
