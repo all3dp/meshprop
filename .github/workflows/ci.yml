@@ -6,11 +6,11 @@ on:
       - master
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  test-ubuntu:
+    runs-on: "ubuntu-latest"
     strategy:
       matrix:
-        node: [ '16', '18', '20' ]
+        node: ["16", "18", "20"]
 
     steps:
       - name: Checkout
@@ -28,7 +28,39 @@ jobs:
           key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.OS }}-npm-cache-
-      
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests
+        run: npm test
+
+  test-macos:
+    runs-on: "macos-latest"
+    strategy:
+      matrix:
+        node: ["16", "18", "20"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache NPM dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
+
       - name: Install npm dependencies
         run: npm ci
 
