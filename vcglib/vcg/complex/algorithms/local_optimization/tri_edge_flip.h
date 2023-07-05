@@ -1,25 +1,25 @@
 /****************************************************************************
- * VCGLib                                                            o o     *
- * Visual and Computer Graphics Library                            o     o   *
- *                                                                _   O  _   *
- * Copyright(C) 2004                                                \/)\/    *
- * Visual Computing Lab                                            /\/|      *
- * ISTI - Italian National Research Council                           |      *
- *                                                                    \      *
- * All rights reserved.                                                      *
- *                                                                           *
- * This program is free software; you can redistribute it and/or modify      *
- * it under the terms of the GNU General Public License as published by      *
- * the Free Software Foundation; either version 2 of the License, or         *
- * (at your option) any later version.                                       *
- *                                                                           *
- * This program is distributed in the hope that it will be useful,           *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
- * for more details.                                                         *
- *                                                                           *
- ****************************************************************************/
+* VCGLib                                                            o o     *
+* Visual and Computer Graphics Library                            o     o   *
+*                                                                _   O  _   *
+* Copyright(C) 2004-2016                                           \/)\/    *
+* Visual Computing Lab                                            /\/|      *
+* ISTI - Italian National Research Council                           |      *
+*                                                                    \      *
+* All rights reserved.                                                      *
+*                                                                           *
+* This program is free software; you can redistribute it and/or modify      *   
+* it under the terms of the GNU General Public License as published by      *
+* the Free Software Foundation; either version 2 of the License, or         *
+* (at your option) any later version.                                       *
+*                                                                           *
+* This program is distributed in the hope that it will be useful,           *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
+* for more details.                                                         *
+*                                                                           *
+****************************************************************************/
 
 #ifndef __VCG_DECIMATION_TRIFLIP
 #define __VCG_DECIMATION_TRIFLIP
@@ -283,9 +283,12 @@ public:
      */
     const char* Info(TRIMESH_TYPE &m)
     {
-        static char dump[60];
-        sprintf(dump,"%lu -> %lu %g\n", tri::Index(m,_pos.F()->V(0)), tri::Index(m,_pos.F()->V(1)),-_priority);
-        return dump;
+        static std::string msg;
+        msg =
+            std::to_string(tri::Index(m,_pos.F()->V(0))) + " -> " +
+            std::to_string(tri::Index(m,_pos.F()->V(1))) +
+            " " + std::to_string(-_priority) + "\n";
+        return msg.c_str();
     }
 
     /*!

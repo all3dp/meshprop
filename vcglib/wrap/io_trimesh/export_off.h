@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -77,17 +77,9 @@ public:
     fprintf(fpout,"%d %d 0\n", m.vn, polynumber); // note that as edge number we simply write zero
 
     //vertices
-    int j;
-    std::vector<int> FlagV;
-    VertexPointer  vp;
-    VertexIterator vi;
     const int DGT = vcg::tri::io::Precision<ScalarType>::digits();
-
-    for(j=0,vi=m.vert.begin();vi!=m.vert.end();++vi)
+    for(auto vp=m.vert.begin();vp!=m.vert.end();++vp)
     {
-      vp=&(*vi);
-      if (vcg::tri::HasPerVertexFlags(m))
-        FlagV.push_back(vp->Flags()); // Save vertex flags
       if( ! vp->IsD() )
       {	// ***** ASCII *****
 
@@ -102,14 +94,8 @@ public:
           fprintf(fpout,"%g %g ",vp->T().u(),vp->T().v());
 
         fprintf(fpout,"\n");
-
-
-        vp->Flags()=j; // Trucco! Nascondi nei flags l'indice del vertice non deletato!
-        j++;
       }
     }
-
-    assert(j==m.vn);
 
 
     if (mask &io::Mask::IOM_BITPOLYGONAL) {
@@ -118,10 +104,17 @@ public:
       tri::UpdateFlags<SaveMeshType>::FaceClearV(m);
       for(FaceIterator fi=m.face.begin();fi!=m.face.end();++fi) if (!fi->IsD()) if (!fi->IsV()) {
         vcg::tri::PolygonSupport<SaveMeshType,SaveMeshType>::ExtractPolygon(&*fi,polygon);
+        //not sure why this std::reverse is needed. ExtractPolygon is used in
+        //many other functions, and nobody complained. however, this list is
+        //clockwise wrt fi normal.
+        std::reverse(polygon.begin(), polygon.end());
         if(!polygon.empty())
         {
           fprintf(fpout,"%d ", int(polygon.size()) );
-          for (size_t i=0; i<polygon.size(); i++) fprintf(fpout,"%d ", polygon[i]->Flags() );
+          for (size_t i=0; i<polygon.size(); i++)
+            fprintf(fpout,"%lu ", tri::Index(m,polygon[i]));
+          if( tri::HasPerFaceColor(m)  && (mask & io::Mask::IOM_FACECOLOR) )
+            fprintf(fpout,"%i %i %i", fi->C()[0],fi->C()[1],fi->C()[2] );
           fprintf(fpout,"\n");
         }
       }
@@ -131,36 +124,35 @@ public:
       {
         if( ! fi->IsD() )
         {
+          fprintf(fpout,"%i ",fi->VN());
+          for(int i=0;i<fi->VN();++i)
+              fprintf(fpout,"%lu ",tri::Index(m,fi->V(i)));
           if( tri::HasPerFaceColor(m)  && (mask & io::Mask::IOM_FACECOLOR) )
-            fprintf(fpout,"3 %d %d %d %i %i %i\n", fi->cV(0)->Flags(),	fi->cV(1)->Flags(), fi->cV(2)->Flags(), fi->C()[0],fi->C()[1],fi->C()[2] );
-            else
-          fprintf(fpout,"3 %d %d %d\n", fi->cV(0)->Flags(),	fi->cV(1)->Flags(), fi->cV(2)->Flags() );
+            fprintf(fpout,"%i %i %i", fi->C()[0],fi->C()[1],fi->C()[2] );
+          fprintf(fpout,"\n");
         }
       }
     }
 
-
-    fclose(fpout);
-    // Recupera i flag originali
-    j=0;
-    for(vi=m.vert.begin();vi!=m.vert.end();++vi)
-      (*vi).Flags()=FlagV[j++];
-
-    return 0;
+	int result = 0;
+	if (ferror(fpout)) result = 2;
+	fclose(fpout);
+	return result;
   }
 
   static const char *ErrorMsg(int error)
   {
-    static std::vector<std::string> off_error_msg;
-    if(off_error_msg.empty())
-    {
-      off_error_msg.resize(2 );
-      off_error_msg[0]="No errors";
-      off_error_msg[1]="Can't open file";
-    }
+	  static std::vector<std::string> off_error_msg;
+	  if (off_error_msg.empty())
+	  {
+		  off_error_msg.resize(3);
+		  off_error_msg[0] = "No errors";
+		  off_error_msg[1] = "Can't open file";
+		  off_error_msg[2] = "Output Stream error";
+	  }
 
-    if(error>1 || error<0) return "Unknown error";
-    else return off_error_msg[error].c_str();
+	  if (error>2 || error<0) return "Unknown error";
+	  else return off_error_msg[error].c_str();
   }
   /*
             returns mask of capability one define with what are the saveable information of the format.

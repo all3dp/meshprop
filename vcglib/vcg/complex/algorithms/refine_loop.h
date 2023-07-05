@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -34,9 +34,6 @@
 #include <vcg/space/point3.h>
 #include <vcg/complex/complex.h>
 #include <vcg/complex/algorithms/refine.h>
-#include <vcg/space/color4.h>
-#include <vcg/container/simple_temporary_data.h>
-#include <vcg/complex/algorithms/update/flag.h>
 #include <vcg/complex/algorithms/update/color.h>
 
 
@@ -103,7 +100,7 @@ struct RegularLoopWeight {
                 .69908
         };
 
-        return (k<=12)?(1.0-bkPolar[k-3])/k:LoopWeight<SCALAR_TYPE>().beta(k);
+        return (k<=12 && k>=3)?(1.0-bkPolar[k-3])/k:LoopWeight<SCALAR_TYPE>().beta(k);
     }
 
     inline SCALAR_TYPE incidentRegular(int k) {
@@ -123,7 +120,7 @@ struct RegularLoopWeight {
                 .44579
         };
 
-        return (k<=12)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().incidentIrregular(k);
+        return (k<=12 && k>=3)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().incidentIrregular(k);
     }
     inline SCALAR_TYPE opposite(int k) {
         static SCALAR_TYPE bkPolar[] = {
@@ -139,7 +136,7 @@ struct RegularLoopWeight {
                 .19828
         };
 
-        return (k<=12)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().opposite(k);
+        return (k<=12 && k >= 3)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().opposite(k);
     }
 };
 
@@ -159,7 +156,7 @@ struct ContinuityLoopWeight {
                 .70014
         };
 
-        return (k<=12)?(1.0-bkPolar[k-3])/k:LoopWeight<SCALAR_TYPE>().beta(k);
+        return (k<=12 && k>= 3)?(1.0-bkPolar[k-3])/k:LoopWeight<SCALAR_TYPE>().beta(k);
     }
 
     inline SCALAR_TYPE incidentRegular(int k) {
@@ -179,7 +176,7 @@ struct ContinuityLoopWeight {
                 .2452
         };
 
-        return (k<=12)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().incidentIrregular(k);
+        return (k<=12 && k>=3)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().incidentIrregular(k);
     }
     inline SCALAR_TYPE opposite(int k) {
         static SCALAR_TYPE bkPolar[] = {
@@ -195,7 +192,7 @@ struct ContinuityLoopWeight {
                 .29934
         };
 
-        return (k<=12)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().opposite(k);
+        return (k<=12 && k >= 3)?bkPolar[k-3]:LoopWeight<SCALAR_TYPE>().opposite(k);
     }
 };
 
@@ -343,7 +340,7 @@ struct LS3Projection {
 };
 
 template<class MESH_TYPE, class METHOD_TYPE=Centroid<MESH_TYPE>, class WEIGHT_TYPE=LoopWeight<typename MESH_TYPE::ScalarType> >
-struct OddPointLoopGeneric : public std::unary_function<face::Pos<typename MESH_TYPE::FaceType> , typename MESH_TYPE::VertexType>
+struct OddPointLoopGeneric
 {
   typedef METHOD_TYPE Projection;
   typedef WEIGHT_TYPE Weight;
@@ -430,7 +427,7 @@ struct OddPointLoopGeneric : public std::unary_function<face::Pos<typename MESH_
 };
 
 template<class MESH_TYPE, class METHOD_TYPE=Centroid<MESH_TYPE>, class WEIGHT_TYPE=LoopWeight<typename MESH_TYPE::ScalarType> >
-struct EvenPointLoopGeneric : public std::unary_function<face::Pos<typename MESH_TYPE::FaceType> , typename MESH_TYPE::VertexType>
+struct EvenPointLoopGeneric
 {
     typedef METHOD_TYPE Projection;
     typedef WEIGHT_TYPE Weight;

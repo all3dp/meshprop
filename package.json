@@ -1,6 +1,6 @@
 {
   "name": "meshprop",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "Get 3D mesh properties",
   "main": "index.js",
   "scripts": {
@@ -27,13 +27,13 @@
     "stl"
   ],
   "dependencies": {
-    "node-addon-api": "4.3.0",
-    "node-pre-gyp": "0.17.0"
+    "@mapbox/node-pre-gyp": "1.0.10",
+    "node-addon-api": "7.0.0"
   },
   "devDependencies": {
     "assert": "2.0.0",
-    "aws-sdk": "2.1354.0",
-    "mocha": "9.2.0"
+    "aws-sdk": "2.1410.0",
+    "mocha": "10.2.0"
   },
   "bundledDependencies": [
     "node-pre-gyp"

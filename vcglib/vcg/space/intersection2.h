@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -238,7 +238,7 @@ namespace vcg {
 
 		///then text convex
 		if (!Convex(p0,p1,p2))
-			std::swap<Point2<SCALAR_TYPE> >(p1,p2);
+			std::swap(p1,p2);
 		return((Convex(p,p0,p1))&&(Convex(p,p1,p2))&&(Convex(p,p2,p0)));
 		//return((Convex(p,p0,p1))&&(Convex(p,p1,p2))&&(Convex(p,p2,p0)));
 	}
@@ -293,8 +293,7 @@ namespace vcg {
 			BB.Add(polygon[i].P1());
 		}
 		if (!BB.IsIn(p))return false;
-		ScalarType size=BB.Diag();
-		///take 4 directions
+        //take 4 directions
 		int inside_test=0;
 		for (int dir=0;dir<4;dir++)
 		{

@@ -2,7 +2,7 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2004                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
@@ -75,7 +75,7 @@ public:
       RotoType rot;	 // rotation
       Point3<S> tra; // viewpoint
   public:
-      ReferenceFrame(){}
+      ReferenceFrame():rot(),tra(){}
 
       void SetIdentity(){ rot.SetIdentity(); tra = Point3<S>(0.0,0.0,0.0);}
       void SetTra(const Point3<S> & tr) {tra = tr;}
@@ -87,18 +87,21 @@ public:
   Camera<S>	                       Intrinsics;		// the camera that made the shot
   ReferenceFrame<S,RotationType>   Extrinsics;		// the position and orientation of the camera
   Shot(const Camera<S> &i, const ReferenceFrame<S,RotationType> &e)
+      :Intrinsics(),Extrinsics()
   {
     Intrinsics = i;
     Extrinsics = e;
   }
 
   Shot(const Camera<S> &c)
+      :Intrinsics(),Extrinsics()
   {
     Intrinsics = c;
     Extrinsics.SetIdentity();
   }
 
   Shot()
+      :Intrinsics(),Extrinsics()
   {
     Extrinsics.SetIdentity();
   }
@@ -124,7 +127,7 @@ public:
   void SetViewPoint(const vcg::Point3<S> & viewpoint);
 
   /// GET fov from focal
-  float GetFovFromFocal();
+  float GetFovFromFocal() const;
 
   /// look at (point+up)
   void LookAt(const vcg::Point3<S> & point,const vcg::Point3<S> & up);
@@ -204,7 +207,7 @@ public:
     }
 
   /*  multiply the current reference frame for the matrix passed
-   note: it is up to the caller to check the the matrix passed is a pure rototraslation
+   note: it is up to the caller to check the the matrix passed is a pure rototranslation
    */
   void MultMatrix(    vcg::Matrix44<S>    m44)
   {
@@ -215,7 +218,7 @@ public:
   }
 
   /*  multiply the current reference frame for the similarity passed
-   note: it is up to the caller to check the the matrix passed is a pure rototraslation
+   note: it is up to the caller to check the the matrix passed is a pure rototranslation
    */
   void MultSimilarity( const Similarity<S> & s){ MultMatrix(s.Matrix());}
 
@@ -253,7 +256,7 @@ void Shot<S,RotationType>::SetViewPoint(const vcg::Point3<S> & viewpoint)
 
 /// GET fov from focal
 template <class S, class RotationType>
-float Shot<S,RotationType>::GetFovFromFocal()
+float Shot<S,RotationType>::GetFovFromFocal() const
 {
   double viewportYMm= Intrinsics.PixelSizeMm[1]* Intrinsics.ViewportPx[1];
   return 2*(vcg::math::ToDeg(atanf(viewportYMm/(2*Intrinsics.FocalMm))));

@@ -2,13 +2,13 @@
 * VCGLib                                                            o o     *
 * Visual and Computer Graphics Library                            o     o   *
 *                                                                _   O  _   *
-* Copyright(C) 2006                                                \/)\/    *
+* Copyright(C) 2004-2016                                           \/)\/    *
 * Visual Computing Lab                                            /\/|      *
 * ISTI - Italian National Research Council                           |      *
 *                                                                    \      *
 * All rights reserved.                                                      *
 *                                                                           *
-* This program is free software; you can redistribute it and/or modify      *
+* This program is free software; you can redistribute it and/or modify      *   
 * it under the terms of the GNU General Public License as published by      *
 * the Free Software Foundation; either version 2 of the License, or         *
 * (at your option) any later version.                                       *
@@ -1900,9 +1900,9 @@ public:
     // CIE xyY --> CIE XYZ
     static void xyYtoXYZ(double x, double y, double _Y, double &X, double &Y, double &Z)
     {
-        X = x * (Y / y);
+        X = x * (_Y / y);
         Y = _Y;
-        Z = (1.0 - x - y) * (Y / y);
+        Z = (1.0 - x - y) * (_Y / y);
     }
 
     static Color4<T> XYZtoxyY(const Color4<T> & color)
@@ -1916,11 +1916,11 @@ public:
     }
 
     // CIE XYZ --> CIE xyY
-    static void XYZtoxyY(double X, double _Y, double Z, double &x, double &y, double &Y)
+    static void XYZtoxyY(double X, double Y, double Z, double &x, double &y, double &_Y)
     {
         x = X / (X + Y + Z);
         y = Y / (X + Y + Z);
-        Y = _Y;
+        _Y = Y;
     }
 
     // XYZ (Illuminant src) --> XYZ (Illuminant dest) - [ILLUMINANT CHANGE]
