@@ -1,6 +1,6 @@
 {
   "name": "meshprop",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Get 3D mesh properties",
   "main": "index.js",
   "scripts": {
