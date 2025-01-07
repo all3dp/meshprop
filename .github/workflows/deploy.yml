@@ -45,7 +45,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   release-macos:
-    runs-on: macos-13
+    runs-on: macos-latest
     strategy:
       matrix:
         node: ["16", "18", "20", "22"]
