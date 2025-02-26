@@ -8,7 +8,7 @@
     "prepare": "npm ls",
     "install": "node-pre-gyp install --fallback-to-build",
     "build": "node-gyp configure && node-pre-gyp clean && node-pre-gyp build",
-    "test": "mocha tests/*.js --loader node",
+    "test": "mocha tests/*.js",
     "release": "node-pre-gyp package && node-pre-gyp testpackage && node-pre-gyp unpublish && node-pre-gyp publish"
   },
   "author": "All3dp <info@all3dp.com>",
