@@ -1,3 +1,5 @@
-var meshprop = require('./build/Release/meshprop');
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 
-module.exports = meshprop;
+const meshprop = require('./build/Release/meshprop');
+export default meshprop;

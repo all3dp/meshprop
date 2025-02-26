@@ -1,8 +1,9 @@
 {
   "name": "meshprop",
-  "version": "5.0.2",
+  "version": "6.0.0",
   "description": "Get 3D mesh properties",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "prepare": "npm ls",
     "install": "node-pre-gyp install --fallback-to-build",
@@ -33,7 +34,7 @@
   "devDependencies": {
     "assert": "2.1.0",
     "aws-sdk": "2.1692.0",
-    "mocha": "10.8.2"
+    "mocha": "11.1.0"
   },
   "bundledDependencies": [
     "@mapbox/node-pre-gyp"
