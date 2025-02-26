@@ -11,8 +11,8 @@ Supported by VCG library: PLY, STL, OFF, OBJ, 3DS, COLLADA, PTX, V3D, PTS, APTS,
 Works most reliable with STL and PLY, other formats might experience problems with parsing geometries.
 
 Usage
-```
-var meshprop = require('meshprop');
+```javascript
+import { meshprop } from 'meshprop';
 
 meshprop.parse('path-to-my-mesh.stl', function(err, props) {
   console.log(props);
