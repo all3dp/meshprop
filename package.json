@@ -34,7 +34,7 @@
   "devDependencies": {
     "assert": "2.1.0",
     "aws-sdk": "2.1692.0",
-    "mocha": "10.8.2"
+    "mocha": "11.1.0"
   },
   "bundledDependencies": [
     "@mapbox/node-pre-gyp"
