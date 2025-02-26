@@ -28,8 +28,8 @@
     "stl"
   ],
   "dependencies": {
-    "@mapbox/node-pre-gyp": "1.0.11",
-    "node-addon-api": "7.1.1"
+    "@mapbox/node-pre-gyp": "2.0.0",
+    "node-addon-api": "8.3.1"
   },
   "devDependencies": {
     "assert": "2.1.0",
