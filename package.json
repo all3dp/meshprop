@@ -3,11 +3,12 @@
   "version": "5.0.2",
   "description": "Get 3D mesh properties",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "prepare": "npm ls",
     "install": "node-pre-gyp install --fallback-to-build",
     "build": "node-gyp configure && node-pre-gyp clean && node-pre-gyp build",
-    "test": "mocha tests/*.js",
+    "test": "mocha tests/*.js --loader node",
     "release": "node-pre-gyp package && node-pre-gyp testpackage && node-pre-gyp unpublish && node-pre-gyp publish"
   },
   "author": "All3dp <info@all3dp.com>",
