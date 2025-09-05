@@ -29,12 +29,12 @@
   ],
   "dependencies": {
     "@mapbox/node-pre-gyp": "2.0.0",
-    "node-addon-api": "8.3.1"
+    "node-addon-api": "8.5.0"
   },
   "devDependencies": {
     "assert": "2.1.0",
     "aws-sdk": "2.1692.0",
-    "mocha": "11.1.0"
+    "mocha": "11.7.2"
   },
   "bundledDependencies": [
     "@mapbox/node-pre-gyp"
