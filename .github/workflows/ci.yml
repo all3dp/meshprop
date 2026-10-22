@@ -5,9 +5,13 @@ on:
     branches-ignore:
       - master
 
+permissions: {}
+
 jobs:
   test-ubuntu:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         node: ["18", "20", "22", "24"]
@@ -40,6 +44,8 @@ jobs:
 
   test-macos:
     runs-on: "macos-latest"
+    permissions:
+      contents: read
     strategy:
       matrix:
         node: ["18", "20", "22", "24"]
