@@ -5,10 +5,22 @@ on:
     branches:
       - master
 
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release-ubuntu:
     runs-on: ubuntu-latest
+    environment: prod
+    permissions:
+      contents: read
+      id-token: write
     strategy:
+      # A leg cancelled between unpublish and publish would leave its binary missing.
+      fail-fast: false
       matrix:
         node: ["18", "20", "22", "24"]
 
@@ -38,15 +50,36 @@ jobs:
       - name: Tests
         run: npm test
 
+      # A re-run keeps its original commit, so without this an old run could republish older binaries.
+      - name: Require the tip of master
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MASTER_SHA="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/master" --jq .object.sha)"
+          if [[ "$GITHUB_SHA" != "$MASTER_SHA" ]]; then
+            echo "Commit $GITHUB_SHA is no longer the tip of master ($MASTER_SHA), refusing to publish it" >&2
+            exit 1
+          fi
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::862461421235:role/cicd-role-meshprop-prod
+          aws-region: eu-west-1
+          translate-env-variables: false
+          allowed-account-ids: "862461421235"
+
       - name: Release
         run: npm run release
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   release-macos:
     runs-on: macos-latest
+    environment: prod
+    permissions:
+      contents: read
+      id-token: write
     strategy:
+      # A leg cancelled between unpublish and publish would leave its binary missing.
+      fail-fast: false
       matrix:
         node: ["18", "20", "22", "24"]
 
@@ -76,8 +109,23 @@ jobs:
       - name: Tests
         run: npm test
 
+      # A re-run keeps its original commit, so without this an old run could republish older binaries.
+      - name: Require the tip of master
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MASTER_SHA="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/master" --jq .object.sha)"
+          if [[ "$GITHUB_SHA" != "$MASTER_SHA" ]]; then
+            echo "Commit $GITHUB_SHA is no longer the tip of master ($MASTER_SHA), refusing to publish it" >&2
+            exit 1
+          fi
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::862461421235:role/cicd-role-meshprop-prod
+          aws-region: eu-west-1
+          translate-env-variables: false
+          allowed-account-ids: "862461421235"
+
       - name: Release
         run: npm run release
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
